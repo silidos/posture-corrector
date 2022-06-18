@@ -1,18 +1,14 @@
 import cv2
-import time
-import threading
+from playsound import playsound
+import keyboard
 
-
-def printit():
-    threading.Timer(5.0, printit).start()
-    print("hi")
-
-
+# Get webcam
 cap = cv2.VideoCapture(0)
 
 # Create the haar cascade
 faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
+# Miscellaneous variables for logic
 wait_to_display = 0
 wait_to_display_initial_value = 0
 initial_value_retrieved = False
@@ -30,6 +26,11 @@ def reset_values():
     global value_changed_by_30
     value_changed_by_30 = 0
     print("values reset")
+
+
+def play_sound():
+    playsound("error_sound.wav")
+    print('Fix your posture!')
 
 
 while True:
@@ -65,24 +66,23 @@ while True:
                 value_changed_by_100 = value_changed_by_100 + 1
                 if value_changed_by_100 >= 4:
                     reset_values()
-                    print("play alert here")
+                    play_sound()
             if (y + h) - initial_value > 50:
                 value_changed_by_50 = value_changed_by_50 + 1
                 if value_changed_by_50 >= 6:
                     reset_values()
-                    print("play alert here")
+                    play_sound()
             if (y + h) - initial_value > 30:
                 value_changed_by_30 = value_changed_by_30 + 1
                 if value_changed_by_30 >= 9:
                     reset_values()
-                    print("play alert here")
+                    play_sound()
             # 10 ticks - 9 seconds
             wait_to_display = 0
     # Display the resulting frame
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if keyboard.is_pressed('`'):
+        print("Posture tracking is stopping")
         break
 
 # When everything done, release the capture
 cap.release()
-cv2.destroyAllWindows()
